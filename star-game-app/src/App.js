@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 
@@ -6,7 +6,7 @@ import './App.css';
 
  
 
-const StarBoard = function() {
+const Star = function() {
   return (
     
           <div className="star" />
@@ -16,13 +16,16 @@ const StarBoard = function() {
   );
 }
 
- 
+  
 
 const NumBoard = (props) => {
-   const handleClick = (e) =>{
-    console.log(e.target.id)
+  
+  const handleClick = (e) =>{
+	props.numberClickHandler(e.target.id);
+    //console.log(e.target.id)
   }
-   function computeState(num)
+  
+  function computeState(num)
   {
     console.log(props.usedNumbers)
     if(props.usedNumbers.includes(num))
@@ -33,16 +36,15 @@ const NumBoard = (props) => {
       {
         return "wrongNumber";
       }
+	if(props.selectedNumber.includes(num))
+      {
+        return "selectedNumber";
+      }
+	  
   }
    
-   
-   
-
- 
-
-  
   return(
-    utils.range(1,9).map( num => <Num num={num}  onClickHandler={handleClick} isUsed={computeState(num)}/>)
+    utils.range(1,9).map( num => <Num num={num} key={num} onClickHandler={handleClick} isUsed={computeState(num)}/>)
   )
 }
 
@@ -59,9 +61,12 @@ const Num = (props) => {
       {
         return "number wrong";
       }
+	 if(isUsed==="selectedNumber")
+      {
+        return "number selected";
+      }
     return "number";
   }
- console.log(props.isUsed);
   return(
   <button className="number" id = {props.num} onClick={props.onClickHandler} className={computeClass(props.isUsed)}>{props.num}</button>
   );
@@ -73,7 +78,15 @@ const App = () => {
   const [starCount,setStarCount] = useState(utils.random(1,9));
   const [usedNumbers, setUsedNumbers] = useState([1, 6, 7, 8]);
   const [wrongNumbers, setWrongNumbers] = useState([2,4]);
-  const [selectedNumbers, setSelectedgNumbers] = useState([3,5]);
+  const [selectedNumbers, setSelectedNumbers] = useState([3,5]);
+  
+  function numberClickHandler(selectedNum){
+	selectedNumbers = selectedNumbers.push(selectedNum);
+	setSelectedNumbers(selectedNumbers);
+	 
+	//var sum = selectedNumbers.sum()
+	console.log(selectedNum);
+  }
   
   return (
     <div className="game">
@@ -82,11 +95,13 @@ const App = () => {
       </div>
       <div className="body">
         <div className="left">
-         { utils.range(1,starCount).map((el) => <StarBoard/>)
+         { utils.range(1,starCount).map((el) => <Star key={el} />)
           }
         </div>
         <div className="right">
-          <NumBoard usedNumbers={usedNumbers} wrongNumber={wrongNumbers}  />
+          <NumBoard usedNumbers={usedNumbers} wrongNumber={wrongNumbers} 
+			selectedNumber={selectedNumbers} 
+			numberClickHandler={numberClickHandler} />
         </div>
       </div>
       <div className="timer">Time Remaining: 10</div>
