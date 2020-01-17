@@ -21,13 +21,13 @@ const Star = function() {
 const NumBoard = (props) => {
   
   const handleClick = (e) =>{
-	props.numberClickHandler(e.target.id);
+	props.numberClickHandler( parseInt(e.target.id));
     //console.log(e.target.id)
   }
   
   function computeState(num)
   {
-    console.log(props.usedNumbers)
+    //console.log(props.usedNumbers)
     if(props.usedNumbers.includes(num))
   {
       return "usedNumber";
@@ -76,16 +76,23 @@ const Num = (props) => {
 
 const App = () => {
   const [starCount,setStarCount] = useState(utils.random(1,9));
-  const [usedNumbers, setUsedNumbers] = useState([1, 6, 7, 8]);
-  const [wrongNumbers, setWrongNumbers] = useState([2,4]);
-  const [selectedNumbers, setSelectedNumbers] = useState([3,5]);
+  const [usedNumbers, setUsedNumbers] = useState([]);
+  const [wrongNumbers, setWrongNumbers] = useState([]);
+  let [selectedNumbers, setSelectedNumbers] = useState([]);
   
   function numberClickHandler(selectedNum){
-	selectedNumbers = selectedNumbers.push(selectedNum);
-	setSelectedNumbers(selectedNumbers);
+	//selectedNumbers = selectedNumbers.push(selectedNum);
+	setSelectedNumbers([...selectedNumbers, selectedNum]);
+	
 	 
-	//var sum = selectedNumbers.sum()
-	console.log(selectedNum);
+	var sum = utils.sum(selectedNumbers) + selectedNum;
+	console.log(sum);
+	if (sum == starCount){
+		setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
+		setSelectedNumbers([]);
+		console.log(usedNumbers);
+		setStarCount(utils.random(1,9));
+	}
   }
   
   return (
