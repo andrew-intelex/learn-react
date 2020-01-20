@@ -29,7 +29,7 @@ const NumBoard = (props) => {
   {
     //console.log(props.usedNumbers)
     if(props.usedNumbers.includes(num))
-  {
+    {
       return "usedNumber";
       }
     if(props.wrongNumber.includes(num))
@@ -44,7 +44,11 @@ const NumBoard = (props) => {
   }
    
   return(
-    utils.range(1,9).map( num => <Num num={num} key={num} onClickHandler={handleClick} isUsed={computeState(num)}/>)
+    utils.range(1,9).map( num => 
+		<Num num={num} key={num} 
+			onClickHandler={handleClick} 
+			isUsed={computeState(num)}/>
+	)
   )
 }
 
@@ -78,15 +82,22 @@ const App = () => {
   const [starCount,setStarCount] = useState(utils.random(1,9));
   const [usedNumbers, setUsedNumbers] = useState([]);
   const [wrongNumbers, setWrongNumbers] = useState([]);
-  let [selectedNumbers, setSelectedNumbers] = useState([]);
+  const [selectedNumbers, setSelectedNumbers] = useState([]);
   
-  function numberClickHandler(selectedNum){
-	//selectedNumbers = selectedNumbers.push(selectedNum);
-	setSelectedNumbers([...selectedNumbers, selectedNum]);
+  const numberClickHandler = (selectedNum) => {
+
+	if (!selectedNumbers.includes(selectedNum)) {
 	
-	 
+		setSelectedNumbers([...selectedNumbers, selectedNum]);
+	}
+	else {
+		// ?????????????? SPILICE REALLY ???????
+		var updated = selectedNumbers.splice(selectedNumbers.indexOf(selectedNum), 1 );
+		
+		setSelectedNumbers(updated);
+	}
+	
 	var sum = utils.sum(selectedNumbers) + selectedNum;
-	console.log(sum);
 	if (sum == starCount){
 		setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
 		setSelectedNumbers([]);
