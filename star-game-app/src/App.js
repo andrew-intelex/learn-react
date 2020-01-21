@@ -84,20 +84,31 @@ const App = () => {
   const [wrongNumbers, setWrongNumbers] = useState([]);
   const [selectedNumbers, setSelectedNumbers] = useState([]);
   
-  const numberClickHandler = (selectedNum) => {
+    const numberClickHandler = (selectedNum) => {
 
+        if (usedNumbers.includes(selectedNum) ){
+            return;
+        }
+        if (wrongNumbers.includes(selectedNum)) {
+            const updated = wrongNumbers.filter(no => no != selectedNum);
+            setWrongNumbers(updated);
+            //setSelectedNumbers([...selectedNum]);
+           
+        }
 	if (!selectedNumbers.includes(selectedNum)) {
 	
 		setSelectedNumbers([...selectedNumbers, selectedNum]);
 	}
-	else {
-		// ?????????????? SPILICE REALLY ???????
-		var updated = selectedNumbers.splice(selectedNumbers.indexOf(selectedNum), 1 );
-		
-		setSelectedNumbers(updated);
+	else {		
+        const updated = selectedNumbers.filter(no => no != selectedNum);
+        setSelectedNumbers(updated);
 	}
 	
-	var sum = utils.sum(selectedNumbers) + selectedNum;
+        var sum = utils.sum(selectedNumbers) + selectedNum;
+        if (sum > starCount) {
+            setWrongNumbers([...wrongNumbers, ...selectedNumbers, selectedNum]);
+            setSelectedNumbers([]);
+        }
 	if (sum == starCount){
 		setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
 		setSelectedNumbers([]);
