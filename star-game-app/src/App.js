@@ -4,7 +4,89 @@ import './App.css';
 
 // v1 STAR MATCH - Starting Template
 
- 
+const App = () => {
+
+    let initialState = [...Array(9).keys()].map(x => ({
+        number: x + 1,
+        selected: false,
+        used: false,
+        wrong: false
+    }));
+
+    const [boardState, setBoardState] = useState(initialState);
+
+
+
+    const [starCount, setStarCount] = useState(utils.random(1, 9));
+    const [usedNumbers, setUsedNumbers] = useState([]);
+    const [wrongNumbers, setWrongNumbers] = useState([]);
+    const [selectedNumbers, setSelectedNumbers] = useState([]);
+
+    const numberClickHandler = (selectedNum) => {
+
+        if (usedNumbers.includes(selectedNum)) {
+            return;
+        }
+        if (wrongNumbers.includes(selectedNum)) {
+            const updated = wrongNumbers.filter(no => no != selectedNum);
+            setWrongNumbers(updated);
+            console.log(wrongNumbers);
+            //setSelectedNumbers([...selectedNum]);
+
+        }
+        if (!selectedNumbers.includes(selectedNum)) {
+
+            setSelectedNumbers([...selectedNumbers, selectedNum]);
+        }
+        else {
+            const updated = selectedNumbers.filter(no => no != selectedNum);
+            setSelectedNumbers(updated);
+        }
+
+        var sum = utils.sum(selectedNumbers) + selectedNum;
+        if (sum > starCount) {
+            setWrongNumbers([...wrongNumbers, ...selectedNumbers, selectedNum]);
+            setSelectedNumbers([]);
+        }
+        if (sum == starCount) {
+            setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
+            setSelectedNumbers([]);
+            console.log(usedNumbers);
+            setStarCount(utils.random(1, 9));
+        }
+    }
+
+    let tempState = boardState;
+    boardState[0].isUsed = true;
+
+
+    return (
+
+        
+
+
+        <div className="game">
+            <div className="help">
+                Pick 1 or more numbers that sum to the number of stars
+      </div>
+            <div className="body">
+                <div className="left">
+                    {utils.range(1, starCount).map((el) => <Star key={el} />)
+                    }
+                </div>
+                <div className="right">
+                    <NumBoard /*usedNumbers={usedNumbers} wrongNumber={wrongNumbers} 
+			selectedNumber={selectedNumbers}*/
+                        boardState={tempState}
+                        numberClickHandler={numberClickHandler} />
+                </div>
+            </div>
+            <div className="timer">Time Remaining: 10</div>
+        </div>
+    );
+};
+
+
 
 const Star = function() {
   return (
@@ -19,36 +101,52 @@ const Star = function() {
   
 
 const NumBoard = (props) => {
-  
-  const handleClick = (e) =>{
-	props.numberClickHandler( parseInt(e.target.id));
-    //console.log(e.target.id)
-  }
-  
-  function computeState(num)
-  {
-    //console.log(props.usedNumbers)
-    if(props.usedNumbers.includes(num))
-    {
-      return "usedNumber";
-      }
-    if(props.wrongNumber.includes(num))
-      {
-        return "wrongNumber";
-      }
-	if(props.selectedNumber.includes(num))
-      {
-        return "selectedNumber";
-      }
-	  
-  }
-   
-  return(
-    utils.range(1,9).map( num => 
-		<Num num={num} key={num} 
-			onClickHandler={handleClick} 
-			isUsed={computeState(num)}/>
-	)
+
+    const handleClick = (e) => {
+        props.numberClickHandler(parseInt(e.target.id));
+        //console.log(e.target.id)
+    }
+
+    function computeState(el) {
+        /*
+        if(props.usedNumbers.includes(num))
+        {
+          return "usedNumber";
+          }
+        if(props.wrongNumber.includes(num))
+          {
+            return "wrongNumber";
+          }
+        if(props.selectedNumber.includes(num))
+          {
+            return "selectedNumber";
+          }
+          */
+
+        if (el.wrong) {
+            return "wrongNumber";
+        }
+        if (el.selected) {
+            return "selectedNumber";
+        }
+        if (el.used) {
+            return "usedNumber";
+        }
+        return "";
+    }
+
+    return (
+        //utils.range(1,9).map( num => 
+        //	<Num num={num} key={num} 
+        //		onClickHandler={handleClick} 
+        //		isUsed={computeState(num)}/>
+        //)
+
+        props.boardState.map(el =>
+            <Num num={el.number} key={el.number} onClickHandler={handleClick}
+                status={computeState(el)} />
+        )
+
   )
 }
 
@@ -72,73 +170,13 @@ const Num = (props) => {
     return "number";
   }
   return(
-  <button className="number" id = {props.num} onClick={props.onClickHandler} className={computeClass(props.isUsed)}>{props.num}</button>
+      <button className="number" id={props.num} onClick={props.onClickHandler} className={computeClass(props.status)}>{props.num}</button>
   );
 }
 
  
 
-const App = () => {
-  const [starCount,setStarCount] = useState(utils.random(1,9));
-  const [usedNumbers, setUsedNumbers] = useState([]);
-  const [wrongNumbers, setWrongNumbers] = useState([]);
-  const [selectedNumbers, setSelectedNumbers] = useState([]);
-  
-    const numberClickHandler = (selectedNum) => {
 
-        if (usedNumbers.includes(selectedNum) ){
-            return;
-        }
-        if (wrongNumbers.includes(selectedNum)) {
-            const updated = wrongNumbers.filter(no => no != selectedNum);
-            setWrongNumbers(updated);
-            //setSelectedNumbers([...selectedNum]);
-           
-        }
-	if (!selectedNumbers.includes(selectedNum)) {
-	
-		setSelectedNumbers([...selectedNumbers, selectedNum]);
-	}
-	else {		
-        const updated = selectedNumbers.filter(no => no != selectedNum);
-        setSelectedNumbers(updated);
-	}
-	
-        var sum = utils.sum(selectedNumbers) + selectedNum;
-        if (sum > starCount) {
-            setWrongNumbers([...wrongNumbers, ...selectedNumbers, selectedNum]);
-            setSelectedNumbers([]);
-        }
-	if (sum == starCount){
-		setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
-		setSelectedNumbers([]);
-		console.log(usedNumbers);
-		setStarCount(utils.random(1,9));
-	}
-  }
-  
-  return (
-    <div className="game">
-      <div className="help">
-        Pick 1 or more numbers that sum to the number of stars
-      </div>
-      <div className="body">
-        <div className="left">
-         { utils.range(1,starCount).map((el) => <Star key={el} />)
-          }
-        </div>
-        <div className="right">
-          <NumBoard usedNumbers={usedNumbers} wrongNumber={wrongNumbers} 
-			selectedNumber={selectedNumbers} 
-			numberClickHandler={numberClickHandler} />
-        </div>
-      </div>
-      <div className="timer">Time Remaining: 10</div>
-    </div>
-  );
-};
-
- 
 
 // Color Theme
 const colors = {
