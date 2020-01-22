@@ -18,67 +18,70 @@ const App = () => {
 
 
     const [starCount, setStarCount] = useState(utils.random(1, 9));
-    const [usedNumbers, setUsedNumbers] = useState([]);
-    const [wrongNumbers, setWrongNumbers] = useState([]);
-    const [selectedNumbers, setSelectedNumbers] = useState([]);
+    // const [usedNumbers, setUsedNumbers] = useState([]);
+    // const [wrongNumbers, setWrongNumbers] = useState([]);
+    // const [selectedNumbers, setSelectedNumbers] = useState([]);
 
     const numberClickHandler = (selectedNum) => {
-
-        if (usedNumbers.includes(selectedNum)) {
-            return;
-        }
-        if (wrongNumbers.includes(selectedNum)) {
-            const updated = wrongNumbers.filter(no => no != selectedNum);
-            setWrongNumbers(updated);
-            console.log(wrongNumbers);
-            //setSelectedNumbers([...selectedNum]);
-
-        }
-        if (!selectedNumbers.includes(selectedNum)) {
-
-            setSelectedNumbers([...selectedNumbers, selectedNum]);
-        }
-        else {
-            const updated = selectedNumbers.filter(no => no != selectedNum);
-            setSelectedNumbers(updated);
-        }
-
-        var sum = utils.sum(selectedNumbers) + selectedNum;
-        if (sum > starCount) {
-            setWrongNumbers([...wrongNumbers, ...selectedNumbers, selectedNum]);
-            setSelectedNumbers([]);
-        }
-        if (sum == starCount) {
-            setUsedNumbers([...usedNumbers, ...selectedNumbers, selectedNum]);
-            setSelectedNumbers([]);
-            console.log(usedNumbers);
-            setStarCount(utils.random(1, 9));
-        }
+		
+		// if used, do not do anything
+		if (boardState.filter(el => (el.used && el.number==selectedNum)).length > 0) {
+			return;
+		}
+		
+		// clear wrong
+		for (let i = 0 ; i < boardState.length ; i++) {
+			if (boardState[i].selected) {
+				boardState[i].wrong = false;
+			}
+		}
+		
+		// mark clicked as selected/deselected
+		boardState[selectedNum-1].selected = !boardState[selectedNum-1].selected;		
+		
+		// if selection is correct
+		let selectedNumbers = boardState.filter(el => el.selected).map(el => el.number);
+		let sum = utils.sum(selectedNumbers);
+		if (sum == starCount) {
+			// mark all selected as used; clear selection
+			for (let i = 0 ; i < boardState.length ; i++) {
+				if (boardState[i].selected) {
+					boardState[i].selected = false;
+					boardState[i].used = true;
+				}
+			}
+			
+			let newStarCount = utils.randomSumIn(boardState.filter(el => !el.used).map(el => el.number), 9);
+			setStarCount(newStarCount);
+		}
+		else if (sum < starCount) {
+			// do nothing, continue
+		}			
+		else{
+			// mark all selected as wrong
+			for (let i = 0 ; i < boardState.length ; i++) {
+				if (boardState[i].selected) {
+					boardState[i].wrong = true;
+				}
+			}
+		}
+		
+		setBoardState(JSON.parse(JSON.stringify(boardState)));
     }
-
-    let tempState = boardState;
-    boardState[0].isUsed = true;
 
 
     return (
-
-        
-
-
-        <div className="game">
+		<div className="game">
             <div className="help">
                 Pick 1 or more numbers that sum to the number of stars
-      </div>
+		</div>
             <div className="body">
                 <div className="left">
                     {utils.range(1, starCount).map((el) => <Star key={el} />)
                     }
                 </div>
                 <div className="right">
-                    <NumBoard /*usedNumbers={usedNumbers} wrongNumber={wrongNumbers} 
-			selectedNumber={selectedNumbers}*/
-                        boardState={tempState}
-                        numberClickHandler={numberClickHandler} />
+                    <NumBoard boardState={boardState} numberClickHandler={numberClickHandler} />
                 </div>
             </div>
             <div className="timer">Time Remaining: 10</div>
@@ -92,9 +95,6 @@ const Star = function() {
   return (
     
           <div className="star" />
-
- 
-
   );
 }
 
