@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 
 
-// v1 STAR MATCH - Starting Template
-
 const App = () => {
 
     let initialState = [...Array(9).keys()].map(x => ({
@@ -14,22 +12,16 @@ const App = () => {
     }));
 
     const [boardState, setBoardState] = useState(initialState);
-
-
-
     const [starCount, setStarCount] = useState(utils.random(1, 9));
-    // const [usedNumbers, setUsedNumbers] = useState([]);
-    // const [wrongNumbers, setWrongNumbers] = useState([]);
-    // const [selectedNumbers, setSelectedNumbers] = useState([]);
-
+	
     const numberClickHandler = (selectedNum) => {
 		
 		// if used, do not do anything
-		if (boardState.filter(el => (el.used && el.number==selectedNum)).length > 0) {
+		if (boardState.filter(el => (el.used && el.number === selectedNum)).length > 0) {
 			return;
 		}
 		
-		// clear wrong
+		// clear wrong numbers
 		for (let i = 0 ; i < boardState.length ; i++) {
 			if (boardState[i].selected) {
 				boardState[i].wrong = false;
@@ -39,36 +31,38 @@ const App = () => {
 		// mark clicked as selected/deselected
 		boardState[selectedNum-1].selected = !boardState[selectedNum-1].selected;		
 		
-		// if selection is correct
+		// calc sum of selected
 		let selectedNumbers = boardState.filter(el => el.selected).map(el => el.number);
 		let sum = utils.sum(selectedNumbers);
-		if (sum == starCount) {
-			// mark all selected as used; clear selection
-			for (let i = 0 ; i < boardState.length ; i++) {
-				if (boardState[i].selected) {
-					boardState[i].selected = false;
-					boardState[i].used = true;
-				}
-			}
+		
+		// if selection is correct
+		if (sum === starCount) {
 			
-			let newStarCount = utils.randomSumIn(boardState.filter(el => !el.used).map(el => el.number), 9);
+			// mark all selected as used; clear selection
+			boardState.forEach(function(el) {
+				if (el.selected) {
+					el.selected = false;
+					el.used = true;
+				}
+			});
+			
+			// update number of stars
+			let unusedNumbers = boardState.filter(el => !el.used).map(el => el.number);
+			let newStarCount = utils.randomSumIn(unusedNumbers, 9);
 			setStarCount(newStarCount);
 		}
-		else if (sum < starCount) {
-			// do nothing, continue
-		}			
-		else{
+		else if (sum > starCount) {
+			
 			// mark all selected as wrong
-			for (let i = 0 ; i < boardState.length ; i++) {
-				if (boardState[i].selected) {
-					boardState[i].wrong = true;
+			boardState.forEach(function(el) {
+				if (el.selected) {
+					el.wrong = true;
 				}
-			}
+			});
 		}
 		
 		setBoardState(JSON.parse(JSON.stringify(boardState)));
     }
-
 
     return (
 		<div className="game">
@@ -93,8 +87,7 @@ const App = () => {
 
 const Star = function() {
   return (
-    
-          <div className="star" />
+    <div className="star" />
   );
 }
 
@@ -104,24 +97,9 @@ const NumBoard = (props) => {
 
     const handleClick = (e) => {
         props.numberClickHandler(parseInt(e.target.id));
-        //console.log(e.target.id)
     }
 
     function computeState(el) {
-        /*
-        if(props.usedNumbers.includes(num))
-        {
-          return "usedNumber";
-          }
-        if(props.wrongNumber.includes(num))
-          {
-            return "wrongNumber";
-          }
-        if(props.selectedNumber.includes(num))
-          {
-            return "selectedNumber";
-          }
-          */
 
         if (el.wrong) {
             return "wrongNumber";
@@ -136,57 +114,45 @@ const NumBoard = (props) => {
     }
 
     return (
-        //utils.range(1,9).map( num => 
-        //	<Num num={num} key={num} 
-        //		onClickHandler={handleClick} 
-        //		isUsed={computeState(num)}/>
-        //)
-
         props.boardState.map(el =>
             <Num num={el.number} key={el.number} onClickHandler={handleClick}
                 status={computeState(el)} />
         )
-
-  )
+	)
 }
 
  
 
 const Num = (props) => {
-  function computeClass(isUsed)
-  {
-    if(isUsed==="usedNumber")
-      {
-        return "number used";
-      }
-    if(isUsed==="wrongNumber")
-      {
-        return "number wrong";
-      }
-	 if(isUsed==="selectedNumber")
-      {
-        return "number selected";
-      }
-    return "number";
+	
+  let computeClass = function(status) {
+	  
+	if(status === "usedNumber")
+	{
+		return "number used";
+	}
+	if(status === "wrongNumber")
+	{
+		return "number wrong";
+	}
+	if(status === "selectedNumber")
+	{
+		return "number selected";
+	}
+	return "number";
   }
+  
   return(
-      <button className="number" id={props.num} onClick={props.onClickHandler} className={computeClass(props.status)}>{props.num}</button>
+    <button 
+		id={props.num} 
+		onClick={props.onClickHandler} 
+		className={computeClass(props.status)}>
+			{props.num}
+	</button>
   );
 }
 
- 
 
-
-
-// Color Theme
-const colors = {
-  available: 'lightgray',
-  used: 'lightgreen',
-  wrong: 'lightcoral',
-  candidate: 'deepskyblue',
-};
-
- 
 
 // Math science
 const utils = {
