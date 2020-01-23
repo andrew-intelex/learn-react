@@ -22,11 +22,11 @@ const App = () => {
 		}
 		
 		// clear wrong numbers
-		for (let i = 0 ; i < boardState.length ; i++) {
-			if (boardState[i].selected) {
-				boardState[i].wrong = false;
+		boardState.forEach(function(el) {
+			if (el.selected) {
+				el.wrong = false;
 			}
-		}
+		});
 		
 		// mark clicked as selected/deselected
 		boardState[selectedNum-1].selected = !boardState[selectedNum-1].selected;		
@@ -71,8 +71,11 @@ const App = () => {
 		</div>
             <div className="body">
                 <div className="left">
-                    {utils.range(1, starCount).map((el) => <Star key={el} />)
-                    }
+                    { 
+						utils.range(1, starCount).map(el => 
+							<Star key={el} />
+						) 
+					}
                 </div>
                 <div className="right">
                     <NumBoard boardState={boardState} numberClickHandler={numberClickHandler} />
@@ -85,7 +88,7 @@ const App = () => {
 
 
 
-const Star = function() {
+const Star = () => {
   return (
     <div className="star" />
   );
