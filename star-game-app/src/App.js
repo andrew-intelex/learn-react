@@ -15,6 +15,23 @@ const App = () => {
     const [starCount, setStarCount] = useState(utils.random(1, 9));
     const [isGameOver, setIsGameOver] = useState(false);
 
+    
+    const [timeElapsed, setTimeElapsed] = useState(0);
+
+    // initialize timer
+    const tmpTimerId = setTimeout(() => {
+        if (timeElapsed >= 10) {
+            ResetHandler();
+        }
+        else {
+            setTimeElapsed(timeElapsed + 1);
+        }
+    }, 1000);
+
+        const [timerId, setTimerId] = useState(tmpTimerId);
+
+
+
     const numberClickHandler = (selectedNum) => {
 
         // if used, do not do anything
@@ -76,6 +93,11 @@ const App = () => {
         setBoardState(initialState);
         setIsGameOver(false);
         setStarCount(utils.random(1, 9));
+        setTimeElapsed(0);
+        if (timerId != -1) {
+            clearTimeout(timerId);
+            setTimerId(-1);
+        }
     }
 
     return (
@@ -93,7 +115,7 @@ const App = () => {
                     <NumBoard boardState={boardState} numberClickHandler={numberClickHandler} />
                 </div>
             </div>
-            <div className="timer">Time Remaining: 10</div>
+            <div className="timer">Time Remaining: {timeElapsed}</div>
 
         </div>
     );
