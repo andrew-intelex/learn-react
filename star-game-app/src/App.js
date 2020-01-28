@@ -72,18 +72,9 @@ const App = () => {
 		</div>
             <div className="body">
                 <div className="left">
-                    
-                    if (isGameOver)
-                    {
-                        <PlayAgain />
-                    }
-                    else
-                    {
-                        utils.range(1, starCount).map(el =>
-                            <Star key={el} />
-                        )
-                    }
-                    
+				 {
+					 isGameOver ? <PlayAgain /> :  utils.range(1, starCount).map(el => <Star key={el} />)
+				 }                    
                 </div>
                 <div className="right">
                     <NumBoard boardState={boardState} numberClickHandler={numberClickHandler} />
