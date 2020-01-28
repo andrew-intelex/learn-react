@@ -47,10 +47,17 @@ const App = () => {
                 }
             });
 
+         
             // update number of stars
             let unusedNumbers = boardState.filter(el => !el.used).map(el => el.number);
-            let newStarCount = utils.randomSumIn(unusedNumbers, 9);
-            setStarCount(newStarCount);
+            if (unusedNumbers.length == 0) {
+                setIsGameOver(true);
+            }
+            else {
+                let newStarCount = utils.randomSumIn(unusedNumbers, 9);
+                setStarCount(newStarCount);
+            }
+           
         }
         else if (sum > starCount) {
 
@@ -62,7 +69,13 @@ const App = () => {
             });
         }
 
-        setBoardState(JSON.parse(JSON.stringify(boardState)));
+        setBoardState(JSON.parse(JSON.stringify(boardState)));    
+    }
+
+    const ResetHandler = () => {
+        setBoardState(initialState);
+        setIsGameOver(false);
+        setStarCount(utils.random(1, 9));
     }
 
     return (
@@ -72,8 +85,8 @@ const App = () => {
 		</div>
             <div className="body">
                 <div className="left">
-				 {
-					 isGameOver ? <PlayAgain /> :  utils.range(1, starCount).map(el => <Star key={el} />)
+                    {
+                        isGameOver ? <PlayAgain resetHandler={ResetHandler}/> :  utils.range(1, starCount).map(el => <Star key={el} />)
 				 }                    
                 </div>
                 <div className="right">
@@ -152,11 +165,12 @@ const Num = (props) => {
     );
 }
 
-const PlayAgain = () => {
+const PlayAgain = (props) => {
+
     return (
         <div className="game-done">
             <div className="message">You win</div>
-            <button> Play Again</button>
+            <button onClick={props.resetHandler}> Play Again</button>
         </div>
     );
 }
