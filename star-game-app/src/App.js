@@ -21,7 +21,7 @@ const App = () => {
     // initialize timer
     const tmpTimerId = setTimeout(() => {
         if (timeElapsed >= 10) {
-            ResetHandler();
+           setIsGameOver(true);
         }
         else {
             setTimeElapsed(timeElapsed + 1);
